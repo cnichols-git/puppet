@@ -1,0 +1,71 @@
+## Props to Linux Academy for this
+
+
+Update the /etc/hosts information:
+
+$ sudo $EDITOR /etc/hosts
+
+127.0.0.1   puppet localhost localhost.localdomain localhost4 localhost4.localdomain4
+Add the Puppet 5 Platform repo:
+
+$ sudo rpm -Uvh https://yum.puppet.com/puppet5-release-el-7.noarch.rpm
+dnf install https://yum.puppetlabs.com/puppet-release-el-8.noarch.rpm
+Install Puppet:
+
+$ sudo yum install puppetserver
+Start Puppet, making sure it uses no more than 1 GB of RAM:
+
+$ sudo $EDITOR /etc/sysconfig/puppetserver
+
+JAVA_ARGS="-Xms1g -Xmx1g -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"
+
+$ sudo systemctl start puppetserver
+$ sudo systemctl enable puppetserver
+Ensure any Puppet commands can be used with sudo:
+
+$ sudo $EDITOR /etc/sudoers.d/99_extra
+
+Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/opt/puppetlabs/bin
+
+$ bash
+
+<---------->
+
+Update the /etc/hosts file with the private IP and name of the master:
+
+$ sudo $EDITOR /etc/hosts
+
+10.0.1.100  puppet
+Add the Puppet 5 Platform repository:
+
+$ wget https://apt.puppetlabs.com/puppet5-release-bionic.deb
+$ sudo dpkg -i puppet5-release-bionic.deb
+$ sudo apt update
+Install the Puppet agent:
+
+$ sudo apt install puppet-agent
+Start and enable Puppet:
+
+$ sudo systemctl start puppet
+$ sudo systemctl enable puppet
+Update the secure path:
+
+$ sudo $EDITOR /etc/sudoers.d/99_extra
+
+Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/opt/puppetlabs/bin
+
+$ bash
+
+<---------->
+
+On the Ubuntu 18.04 node, view the fingerprint of the node:
+
+$ sudo puppet agent --fingerprint
+One the master, list the pending certificates to sign:
+
+$ sudo puppetserver ca list
+If the fingerprints match (they should), sign the cert:
+
+$ sudo puppetserver ca sign --certname node1.ec2.internal
+
+
