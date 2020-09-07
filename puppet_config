@@ -98,4 +98,4 @@ puppetserer ca list --all
 puppeterver ca sign --certname <NAME>
 
 find /etc/puppetlabs/puppet/ssl -name puppet.pem -delete
-pupper agent --fingerprint
+puppet agent --fingerprint
