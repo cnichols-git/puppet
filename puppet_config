@@ -1,50 +1,37 @@
 Puppet Automation Software
 
-I have created a created the following:
-puppet-master 
+Change hosts file
 
-Set up NTP
-#sudo yum -y install ntp
-#sudo ntpdate pool.ntp.org
-#sudo vi /etc/ntp.conf
+add the puppet server host name in the hosts file
 
-Add the following entries
-	server 0.us.pool.ntp.org
-	server 1.us.pool.ntp.org
-	server 2.us.pool.ntp.org
-	server 3.us.pool.ntp.org
-
-#sudo systemctl restart ntpd
-#sudo systemctl enable ntpd
-<------------>
-Change host file
-
-#/etc/hostname
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+#/etc/hosts
+127.0.0.1   puppet localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 10.0.0.30 puppet puppet-master puppet-master.local
 10.0.0.31 puppet puppet-client puppet.client.local
+
 <------------>
+
 Add Firewall rule for 8140
 
 #firewall-cmd --zone=public --add-port=8140/tcp --permanent 
 #sudo firewall-cmd --zone=public --list-ports
-<------------>
-Add puppet repository
 
-#sudo yum -y install puppetserver
 <------------>
+
 Configure Memory Allocation on the Puppet Server
 
 #sudo vi /etc/sysconfig/puppetserver
 
 Change the following parameters:
-JAVA_ARGS="-Xms3g -Xmx3g"
+JAVA_ARGS="-Xms3g -Xmx3g" most tuts say to change to "-Xms1g -Xmx1g" this is to use 1GB of RAM 
 
 sudo systemctl start puppetserver
 sudo systemctl enable puppetserver
+
 <------------>
+
 Puppet Configuration File
 
 cd /etc/puppetlabs/puppet/puppet.conf
@@ -54,12 +41,14 @@ logdir = /var/log/puppetlabs/puppetserver
 rundir = /var/run/puppetlabs/puppetserver
 pidfile = /var/run/puppetlabs/puppetserver/puppetserver.pid
 codedir = /etc/puppetlabs/code
-dns_alt_names = puppet-master, puppet-master.local
+dns_alt_names = puppet (if this is the name of the server)
 
 [main]
-certname = puppet-master.local
+certname = puppet
 server = puppet
+
 <------------>
+
 Test tcp connection and certificates
 
 #/opt/puppetlabs/bin/puppet agent --test
@@ -74,7 +63,9 @@ Puppet-client
 
 10.0.0.31 puppet puppet-client puppet-client.local
 10.0.0.30 puppet puppet-master puppet-master.local
+
 <------------>
+
 Add puppet repository
 
 sudo rpm -Uvh http://yum.puppetlabs.com/puppet/puppet-release-el-7.noarch.rpm
@@ -102,3 +93,9 @@ To check for cert request
 -
 To manually launch and watch a Puppet run, run sudo /opt/puppetlabs/bin/puppet agent --test.
 
+Commands:
+puppetserer ca list --all
+puppeterver ca sign --certname <NAME>
+
+find /etc/puppetlabs/puppet/ssl -name puppet.pem -delete
+pupper agent --fingerprint
